@@ -54,6 +54,6 @@ class RegisteredUserController extends Controller
 
         $token = $user->createToken("auth_token")->plainTextToken;
 
-        return ResponseFormatter::success($user, $token);
+        return ResponseFormatter::success(data: $user, token: $token);
     }
 }

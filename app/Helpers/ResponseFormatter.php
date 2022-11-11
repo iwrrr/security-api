@@ -21,11 +21,10 @@ class ResponseFormatter
     /**
      * Give success response.
      */
-    public static function success($data = null, $token = null)
+    public static function success($data = null, $message = null, $token = null)
     {
-        self::$response['message'] = "Success";
-        self::$response['data'] = $data;
-
+        $data == null ? self::$response['data'] = json_decode("{}") : self::$response['data'] = $data;
+        $message == null ? self::$response['message'] = "Success" : self::$response['message'] = $message;
         $token == null ? null : self::$response['token'] = $token;
 
         return response()->json(self::$response, self::$response['code']);

@@ -1,5 +1,7 @@
 <?php
 
+use App\Helpers\ResponseFormatter;
+use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,8 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('user', [UserController::class, 'getUser']);
+    Route::post('user/change-password', [UserController::class, 'changePassword']);
 });
 
 require __DIR__.'/auth.php';
