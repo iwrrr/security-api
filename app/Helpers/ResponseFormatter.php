@@ -33,11 +33,11 @@ class ResponseFormatter
     /**
      * Give error response.
      */
-    public static function error($message = null, $code = 400)
+    public static function error($data = null, $message = null, $code = 400)
     {
         self::$response['code'] = $code;
         self::$response['message'] = $message;
-        self::$response['data'] = json_decode("{}");
+        $data == null ? self::$response['data'] = json_decode("{}") : self::$response['data'] = $data;
 
         return response()->json(self::$response, self::$response['code']);
     }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ResponseFormatter;
+use App\Http\Controllers\API\ArticleController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -17,8 +18,19 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('user', [UserController::class, 'getUser']);
-    Route::post('user/change-password', [UserController::class, 'changePassword']);
+    Route::controller(UserController::class)->group(function () {
+        Route::get('/user', 'getUser');
+        Route::post('/user/change-password', 'changePassword');
+    });
+
+    Route::controller(ArticleController::class)->group(function () {
+        Route::post('/article/store', 'store');
+        Route::get('/article', 'getArticles');
+        Route::get('/article/headline', 'getHeadlineArticles');
+        Route::get('/article/{id}', 'detail');
+        Route::post('/article/{id}/update', 'update');
+        Route::delete('/article/{id}/delete', 'destroy');
+    });
 });
 
 require __DIR__.'/auth.php';

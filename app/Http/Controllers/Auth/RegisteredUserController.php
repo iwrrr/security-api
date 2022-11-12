@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error($validator->errors()->first());
+            return ResponseFormatter::error(message: $validator->errors()->first());
         }
 
         $user = User::create([

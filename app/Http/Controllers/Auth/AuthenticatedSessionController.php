@@ -27,7 +27,7 @@ class AuthenticatedSessionController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseFormatter::error($validator->errors()->first());
+            return ResponseFormatter::error(message: $validator->errors()->first());
         }
 
         $fieldType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
@@ -38,11 +38,11 @@ class AuthenticatedSessionController extends Controller
             $user = User::where($fieldType, $fieldValue)->first();
 
             if (!$user) {
-                return ResponseFormatter::error("User not found.");
+                return ResponseFormatter::error(message: "User not found.");
             }
 
             if (!Hash::check($request->password, $user->password)) {
-                return ResponseFormatter::error("Password is wrong.");
+                return ResponseFormatter::error(message: "Password is wrong.");
             }
 
             Auth::login($user);
@@ -51,7 +51,7 @@ class AuthenticatedSessionController extends Controller
 
             return ResponseFormatter::success(data: $user, token: $token);
         } else {
-            return ResponseFormatter::error("Incorrect Username or Password.");
+            return ResponseFormatter::error(message: "Incorrect Username or Password.");
         }
     }
 
