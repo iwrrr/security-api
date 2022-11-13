@@ -22,7 +22,6 @@ class AuthenticatedSessionController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'login' => ['required', 'string'],
             'password' => ['required', 'string']
         ]);
 
@@ -30,29 +29,21 @@ class AuthenticatedSessionController extends Controller
             return ResponseFormatter::error(message: $validator->errors()->first());
         }
 
-        $fieldType = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-        $fieldValue = $request->login;
-        $request->merge([$fieldType => $fieldValue]);
+        $user = User::where('password', $request->password)->first();
 
-        if (Auth::attempt($request->only($fieldType, 'password'))) {
-            $user = User::where($fieldType, $fieldValue)->first();
-
-            if (!$user) {
-                return ResponseFormatter::error(message: "User not found.");
-            }
-
-            if (!Hash::check($request->password, $user->password)) {
-                return ResponseFormatter::error(message: "Password is wrong.");
-            }
-
-            Auth::login($user);
-
-            $token = $user->createToken("auth_token")->plainTextToken;
-
-            return ResponseFormatter::success(data: $user, token: $token);
-        } else {
-            return ResponseFormatter::error(message: "Incorrect Username or Password.");
+        if (!$user) {
+            return ResponseFormatter::error(message: "User not found.");
         }
+
+        if ($request->password != $user->password) {
+            return ResponseFormatter::error(message: "Incorrect password.");
+        }
+
+        Auth::login($user);
+
+        $token = $user->createToken("auth_token")->plainTextToken;
+
+        return ResponseFormatter::success(data: $user, token: $token);
     }
 
     /**

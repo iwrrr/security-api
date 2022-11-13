@@ -5,24 +5,26 @@ namespace App\Models;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Article extends Model
+class Activity extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * The attributes that should be cast.
      *
-     * @var array<int, string>
+     * @var array<string, string>
      */
-    protected $hidden = [
-        'user_id'
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'satker_id' => 'integer',
     ];
 
     /**
-     * Get the user that owns the Article
+     * Get the user that owns the Activity
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -32,23 +34,23 @@ class Article extends Model
     }
 
     /**
-     * Get all of the likes for the Article
+     * Get all of the likes for the Activity
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function likes()
     {
-        return $this->hasMany(Like::class, 'article_id');
+        return $this->hasMany(Like::class, 'activity_id');
     }
 
     /**
-     * Get all of the comments for the Article
+     * Get all of the comments for the Activity
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function comments()
     {
-        return $this->hasMany(Comment::class, 'article_id');
+        return $this->hasMany(Comment::class, 'activity_id');
     }
 
     /**

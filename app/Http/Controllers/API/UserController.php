@@ -21,16 +21,19 @@ class UserController extends Controller
 
     public function changePassword(Request $request)
     {
+        $user = $request->user();
         $validator = Validator::make($request->all(), [
             'old_password' => ['required'],
             'password' => ['required', 'confirmed', 'min:6'],
         ]);
 
+        if (!$user) {
+            return ResponseFormatter::error(message: 'User not found', code: 404);
+        }
+
         if ($validator->fails()) {
             return ResponseFormatter::error($validator->errors()->first());
         }
-
-        $user = $request->user();
 
         if (!Hash::check($request->old_password, $user->password)) {
             return ResponseFormatter::error("Old password doesn't match");

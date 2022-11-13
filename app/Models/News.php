@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Comment extends Model
+class News extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -22,15 +22,5 @@ class Comment extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
-    }
-
-    /**
-     * Get the Activity that owns the Comment
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function activity()
-    {
-        return $this->belongsTo(Activity::class, 'activity_id');
     }
 }

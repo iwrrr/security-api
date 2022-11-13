@@ -13,13 +13,20 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('articles', function (Blueprint $table) {
+        Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("user_id");
             $table->string("title");
             $table->string("description");
             $table->text("image");
+            $table->string('location')->nullable();
+            $table->double('latitude', 15, 8)->nullable();
+            $table->double('longitude', 15, 8)->nullable();
+            $table->integer('is_published')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
@@ -32,6 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('articles');
+        Schema::dropIfExists('activities');
     }
 };

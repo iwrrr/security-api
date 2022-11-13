@@ -6,13 +6,14 @@ namespace App\Models;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,12 +22,16 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'username',
-        'email',
+        'position',
+        'rank',
         'password',
         'nik',
-        'satker',
-        'role',
+        'phone',
+        'satker_id',
+        'level',
+        'is_active',
+        'created_by',
+        'updated_by',
     ];
 
     /**
@@ -48,6 +53,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'satker_id' => 'integer',
     ];
 
     /**
@@ -59,5 +65,15 @@ class User extends Authenticatable
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Get the satkers that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function satker()
+    {
+        return $this->belongsTo(Satker::class, 'satker_id');
     }
 }

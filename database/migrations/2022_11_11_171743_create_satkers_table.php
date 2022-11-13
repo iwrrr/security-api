@@ -13,15 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('likes', function (Blueprint $table) {
+        Schema::create('satkers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("activity_id");
-            $table->unsignedBigInteger("user_id");
+            $table->string('name');
+            $table->double('latitude', 15, 8)->nullable();
+            $table->double('longitude', 15, 8)->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
-
-            $table->foreign('activity_id')->references('id')->on('activities')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('likes');
+        Schema::dropIfExists('satkers');
     }
 };

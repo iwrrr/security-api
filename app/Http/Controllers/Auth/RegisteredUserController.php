@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use App\Models\Satker;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
 use App\Helpers\ResponseFormatter;
@@ -24,29 +25,31 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:100'],
-            'username' => ['required', 'string', 'max:30', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:50', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'nik' => ['required', 'string', 'unique:users'],
-            'satker' => ['required', 'string'],
-            'role' => ['required', 'string'],
-        ]);
+        $satker = Satker::find($request->satker_id);
+        $params = $request->all();
+
+        $validator = Validator::make(
+            $params,
+            [
+                'name' => ['required', 'string', 'max:100'],
+                'password' => ['required', 'confirmed', 'min:6', 'unique:users'],
+                'nik' => ['required', 'unique:users'],
+                'satker_id' => ['required'],
+            ],
+            [
+                'password.unique' => 'User already exist'
+            ]
+        );
+
+        if (!$satker) {
+            return ResponseFormatter::error(message: 'Satker not found', code: 404);
+        }
 
         if ($validator->fails()) {
             return ResponseFormatter::error(message: $validator->errors()->first());
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'nik' => $request->nik,
-            'satker' => $request->satker,
-            'role' => $request->role,
-        ]);
+        $user = User::create($params);
 
         event(new Registered($user));
 

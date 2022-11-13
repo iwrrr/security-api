@@ -1,10 +1,10 @@
 <?php
 
-use App\Helpers\ResponseFormatter;
-use App\Http\Controllers\API\ArticleController;
-use App\Http\Controllers\API\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\NewsController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\SatkerController;
+use App\Http\Controllers\API\ActivityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,20 +17,42 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/', function () {
+    return ['Laravel' => app()->version()];
+});
+
+Route::controller(SatkerController::class)->group(function () {
+    Route::post('/satker', 'store');
+    Route::get('/satker', 'index');
+    Route::get('/satker/{id}', 'detail');
+    Route::post('/satker/{id}', 'update');
+    Route::delete('/satker/{id}', 'destroy');
+});
+
 Route::middleware(['auth:sanctum'])->group(function () {
+
     Route::controller(UserController::class)->group(function () {
         Route::get('/user', 'getUser');
         Route::post('/user/change-password', 'changePassword');
     });
 
-    Route::controller(ArticleController::class)->group(function () {
-        Route::post('/article/store', 'store');
-        Route::get('/article', 'getArticles');
-        Route::get('/article/headline', 'getHeadlineArticles');
-        Route::get('/article/{id}', 'detail');
-        Route::post('/article/{id}/update', 'update');
-        Route::delete('/article/{id}/delete', 'destroy');
+    Route::controller(ActivityController::class)->group(function () {
+        Route::post('/activity/store', 'store');
+        Route::get('/activity', 'index');
+        Route::get('/activity/{id}', 'detail');
+        Route::post('/activity/{id}', 'update');
+        Route::delete('/activity/{id}', 'destroy');
+    });
+
+    Route::post('/comment', [ActivityController::class, 'addComment']);
+
+    Route::controller(NewsController::class)->group(function () {
+        Route::post('/news/store', 'store');
+        Route::get('/news', 'index');
+        Route::get('/news/{id}', 'detail');
+        Route::post('/news/{id}', 'update');
+        Route::delete('/news/{id}', 'destroy');
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
