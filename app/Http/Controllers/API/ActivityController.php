@@ -22,9 +22,14 @@ class ActivityController extends Controller
     public function index(Request $request)
     {
         if ($request->user_id) {
-            $activities = Activity::where('user_id', $request->user_id)->with(['user'])->get();
+            $activities = Activity::where('user_id', $request->user_id)
+                ->with(['user'])
+                ->withCount(['likes', 'comments'])
+                ->get();
         } else {
-            $activities = Activity::with(['user'])->get();
+            $activities = Activity::with(['user'])
+                ->withCount(['likes', 'comments'])
+                ->get();
         }
 
         if ($activities->isEmpty()) {
@@ -147,7 +152,7 @@ class ActivityController extends Controller
         return ResponseFormatter::success(message: 'Activity deleted successfully');
     }
 
-    public function addComment(Request $request)
+    public function comment(Request $request)
     {
         try {
             $params = $request->all();
@@ -173,5 +178,26 @@ class ActivityController extends Controller
         } catch (Throwable $th) {
             return ResponseFormatter::error(message: "{$th}");
         }
+    }
+
+    public function like(Request $request)
+    {
+        $activity = Activity::find($request->activity_id);
+
+        if (!$activity) {
+            return ResponseFormatter::error(data: $activity, message: 'Activity not found', code: 404);
+        }
+
+        if (!$request->user()->hasLiked($activity)) {
+            $request->user()->like($activity);
+
+            return ResponseFormatter::success(message: 'Activity liked successfully');
+        } else {
+            $request->user()->unlike($activity);
+
+            return ResponseFormatter::success(message: 'Activity unliked successfully');
+        }
+
+        return ResponseFormatter::success(message: 'Activity liked successfully');
     }
 }

@@ -25,16 +25,6 @@ class Like extends Model
     }
 
     /**
-     * Get the activity that owns the Like
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function activity()
-    {
-        return $this->belongsTo(Activity::class, 'activity_id');
-    }
-
-    /**
      * Get the user that owns the Like
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -42,5 +32,10 @@ class Like extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function likeable()
+    {
+        return $this->morphTo();
     }
 }

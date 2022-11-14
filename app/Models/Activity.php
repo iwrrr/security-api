@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Contracts\Likeable;
+use App\Models\Concerns\Likes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Activity extends Model
+class Activity extends Model implements Likeable
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, Likes, SoftDeletes;
 
     protected $guarded = [];
 
@@ -31,16 +33,6 @@ class Activity extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    /**
-     * Get all of the likes for the Activity
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function likes()
-    {
-        return $this->hasMany(Like::class, 'activity_id');
     }
 
     /**

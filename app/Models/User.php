@@ -5,11 +5,13 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use App\Contracts\Likeable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
@@ -75,5 +77,54 @@ class User extends Authenticatable
     public function satker()
     {
         return $this->belongsTo(Satker::class, 'satker_id');
+    }
+
+    /**
+     * Get all of the likes for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function likes()
+    {
+        return $this->hasMany(Like::class, 'user_id');
+    }
+
+    public function hasLiked(Likeable $likeable)
+    {
+        if (!$likeable->exists) {
+            return false;
+        }
+
+        return $this->likes->contains(
+            fn ($like) => $like->likeable_type == get_class($likeable) &&
+                $like->likeable_id == $likeable->id
+        );
+    }
+
+    public function like(Likeable $likeable)
+    {
+        if ($this->hasLiked($likeable)) {
+            return $this;
+        }
+
+        (new Like())
+            ->user()->associate($this)
+            ->likeable()->associate($likeable)
+            ->save();
+
+        return $this;
+    }
+
+    public function unlike(Likeable $likeable)
+    {
+        if (!$this->hasLiked($likeable)) {
+            return $this;
+        }
+
+        $likeable->likes()
+            ->whereHas('user', fn ($q) => $q->whereId($this->id))
+            ->delete();
+
+        return $this;
     }
 }

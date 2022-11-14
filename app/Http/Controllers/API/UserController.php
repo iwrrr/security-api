@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
@@ -22,9 +23,10 @@ class UserController extends Controller
     public function changePassword(Request $request)
     {
         $user = $request->user();
+
         $validator = Validator::make($request->all(), [
             'old_password' => ['required'],
-            'password' => ['required', 'confirmed', 'min:6'],
+            'password' => ['required', 'confirmed', 'min:6', 'unique:users'],
         ]);
 
         if (!$user) {
@@ -32,15 +34,38 @@ class UserController extends Controller
         }
 
         if ($validator->fails()) {
-            return ResponseFormatter::error($validator->errors()->first());
+            return ResponseFormatter::error(message: $validator->errors()->first());
         }
 
-        if (!Hash::check($request->old_password, $user->password)) {
-            return ResponseFormatter::error("Old password doesn't match");
+        if ($request->old_password != $user->password) {
+            return ResponseFormatter::error(message: "Old password doesn't match");
         }
 
         $user->update([
-            'password' => Hash::make($request->password)
+            'password' => $request->password
+        ]);
+
+        return ResponseFormatter::success(message: "Password successfully updated");
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $user = $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'password' => ['required', 'confirmed', 'min:6', 'unique:users'],
+        ]);
+
+        if (!$user) {
+            return ResponseFormatter::error(message: 'User not found', code: 404);
+        }
+
+        if ($validator->fails()) {
+            return ResponseFormatter::error(message: $validator->errors()->first());
+        }
+
+        $user->update([
+            'password' => $request->password
         ]);
 
         return ResponseFormatter::success(message: "Password successfully updated");

@@ -34,17 +34,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::controller(UserController::class)->group(function () {
         Route::get('/user', 'getUser');
         Route::post('/user/change-password', 'changePassword');
+        Route::post('/user/forgot-password', 'forgotPassword');
     });
 
     Route::controller(ActivityController::class)->group(function () {
+        Route::post('/activity/comment', 'comment');
+        Route::post('/activity/like', 'like');
         Route::post('/activity/store', 'store');
         Route::get('/activity', 'index');
         Route::get('/activity/{id}', 'detail');
         Route::post('/activity/{id}', 'update');
         Route::delete('/activity/{id}', 'destroy');
     });
-
-    Route::post('/comment', [ActivityController::class, 'addComment']);
 
     Route::controller(NewsController::class)->group(function () {
         Route::post('/news/store', 'store');
